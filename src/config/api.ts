@@ -1,6 +1,6 @@
 const rawBaseUrl =
   import.meta.env.VITE_API_BASE_URL ||
-  'https://solidoro-backend-production.up.railway.app/api';
+  'https://bmw-backend-production.up.railway.app/api';
 
 export const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 
