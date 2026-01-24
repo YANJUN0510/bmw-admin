@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import './BuildingMaterialCategoryList.css';
 import { api } from '../config/api';
 interface Category {
@@ -10,6 +11,7 @@ interface Category {
 }
 
 const BuildingMaterialCategoryList: React.FC = () => {
+  const { getToken } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -114,8 +116,10 @@ const BuildingMaterialCategoryList: React.FC = () => {
         method = 'PUT';
       }
 
+      const token = await getToken();
       const response = await fetch(url, {
         method,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: data,
       });
 
@@ -137,8 +141,10 @@ const BuildingMaterialCategoryList: React.FC = () => {
 
     setIsDeleting(id);
     try {
+      const token = await getToken();
       const response = await fetch(api(`/building-material-categories/${id}`), {
         method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
 
       if (!response.ok) throw new Error('Failed to delete category');

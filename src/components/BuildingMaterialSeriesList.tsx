@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import './BuildingMaterialSeriesList.css';
 import { api } from '../config/api';
 interface Series {
@@ -9,6 +10,7 @@ interface Series {
 }
 
 const BuildingMaterialSeriesList: React.FC = () => {
+  const { getToken } = useAuth();
   const [seriesList, setSeriesList] = useState<Series[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,8 +104,10 @@ const BuildingMaterialSeriesList: React.FC = () => {
         method = 'PUT';
       }
 
+      const token = await getToken();
       const response = await fetch(url, {
         method,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: data,
       });
 
@@ -124,8 +128,10 @@ const BuildingMaterialSeriesList: React.FC = () => {
 
     setIsDeleting(id);
     try {
+      const token = await getToken();
       const response = await fetch(api(`/building-material-series/${id}`), {
         method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
 
       if (!response.ok) throw new Error('Failed to delete series');

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import Select from 'react-select';
+import { useAuth } from '@clerk/clerk-react';
 import type { BuildingMaterial } from '../types';
 import './BuildingMaterialUpload.css';
 import { api } from '../config/api';
@@ -9,6 +10,7 @@ interface BuildingMaterialUploadProps {
 }
 
 const BuildingMaterialUpload: React.FC<BuildingMaterialUploadProps> = ({ refreshKey }) => {
+  const { getToken } = useAuth();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
@@ -223,8 +225,10 @@ const BuildingMaterialUpload: React.FC<BuildingMaterialUploadProps> = ({ refresh
         });
       }
 
+      const token = await getToken();
       const response = await fetch(api('/building-materials/'), {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       });
 
@@ -372,7 +376,7 @@ const BuildingMaterialUpload: React.FC<BuildingMaterialUploadProps> = ({ refresh
                 multiple
                 required 
               />
-              <span className="helper-text">The 1st image will be the main image. Images 2â€? will be gallery images.</span>
+              <span className="helper-text">The 1st image will be the main image. Other images will be gallery images.</span>
             </div>
             {imagePreviews.length > 0 && (
               <div className="all-images-preview-container">

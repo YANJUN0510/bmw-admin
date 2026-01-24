@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import type { BuildingMaterial } from '../types';
 import { api } from '../config/api';
 import './BuildingMaterialList.css';
@@ -8,6 +9,7 @@ interface BuildingMaterialListProps {
 }
 
 const BuildingMaterialList: React.FC<BuildingMaterialListProps> = ({ onAddMaterial }) => {
+  const { getToken } = useAuth();
   const [materials, setMaterials] = useState<BuildingMaterial[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -112,8 +114,10 @@ const BuildingMaterialList: React.FC<BuildingMaterialListProps> = ({ onAddMateri
 
     setIsDeleting(code);
     try {
+      const token = await getToken();
       const response = await fetch(api(`/building-materials/${code}`), {
         method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
 
       if (response.ok) {
@@ -216,8 +220,10 @@ const BuildingMaterialList: React.FC<BuildingMaterialListProps> = ({ onAddMateri
         });
       }
 
+      const token = await getToken();
       const response = await fetch(api(`/building-materials/${editForm.code}`), {
         method: 'PUT',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       });
 
@@ -316,13 +322,13 @@ const BuildingMaterialList: React.FC<BuildingMaterialListProps> = ({ onAddMateri
               onClick={() => setLayout('list')}
               title="List View"
             >
-              ‚ò?            </button>
+              list view            </button>
             <button 
               className={`layout-btn ${layout === 'grid' ? 'active' : ''}`}
               onClick={() => setLayout('grid')}
               title="Grid View"
             >
-              ‚ä?            </button>
+              grid view            </button>
           </div>
           <button className="add-btn" onClick={onAddMaterial}>
             + Add New Material
@@ -332,7 +338,6 @@ const BuildingMaterialList: React.FC<BuildingMaterialListProps> = ({ onAddMateri
 
       <div className="filter-bar">
         <div className="search-wrapper">
-          <span className="search-icon">üîç</span>
           <input 
             type="text" 
             className="search-input" 
@@ -608,7 +613,7 @@ const BuildingMaterialList: React.FC<BuildingMaterialListProps> = ({ onAddMateri
                         multiple
                       />
                       <small style={{ color: '#64748b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                        Select 1‚Ä? images. The first will be the main image; the rest will be gallery images.
+                        Select 1 images. The first will be the main image; the rest will be gallery images.
                       </small>
                     </div>
 

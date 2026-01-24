@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '@clerk/clerk-react';
 import './MessagesTab.css';
 import { api } from '../config/api';
 interface Message {
@@ -13,6 +14,7 @@ interface Message {
 }
 
 const MessagesTab: React.FC = () => {
+  const { getToken } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,10 +42,12 @@ const MessagesTab: React.FC = () => {
 
   const handleStatusUpdate = async (id: number, done: boolean) => {
     try {
+      const token = await getToken();
       const response = await fetch(api(`/messages/${id}/status`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ done }),
       });
